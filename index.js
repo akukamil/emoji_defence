@@ -1388,6 +1388,7 @@ class screen_2_class
 
 	}
 
+	
 
 	buy()
 	{
@@ -1405,6 +1406,13 @@ class screen_2_class
 		
 		this.send_message("All upgrades reset",blue);	
 	}
+}
+
+function API_callback(method, result, data)
+{
+	
+	console.log(method, result,data);
+	
 }
 
 class screen_3_class

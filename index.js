@@ -1411,7 +1411,8 @@ class screen_2_class
 function API_callback(method, result, data)
 {
 	
-	console.log(method, result,data);
+        var str = "{ \"method\": \"" + method + "\", \"result\": \"" + result + "\", \"data\": \"" + data + "\",}";
+        console.log(str);
 	
 }
 

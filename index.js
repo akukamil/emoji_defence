@@ -727,12 +727,14 @@ class tower_control_class
 		//если это нажатие на открытую уже башню то просто закрываем
 		if (tower_control_class.selected_tower==this.id && as_pressed==true)
 		{
+			
 			tower_control_class.selected_tower=-1;
 			return;			
 		}
 		
 		if (this.type==slot)
 		{			
+			towers.forEach(e=>e.hide_attributes())
 			//сразу покупаем единственную которая есть в игре башню
 			this.buy_tower_down(0);
 			return;
@@ -806,8 +808,32 @@ class tower_control_class
 
 					objects.towers_upg_text_array[ind].text=long_param_name + "\n"+cur_val+" > "+new_val+"\n                         BUY ( "+new_val_price+"$ )";
 					
+					
+					//проверяем что нельзя покупать апгрейды которые не возможно использовать
+					var not_yet=0;
+					if (this.upgrade_levels["tlp_chance"]==0)
+					{
+						if (param=="tlp_damage" || param=="tlp_dist")
+						{
+							
+							objects.towers_upg_text_array[ind].text="upgrade teleport\nchance first";
+							not_yet=1;
+						}						
+					}
+						
+					if (this.upgrade_levels["frz_chance"]==0)
+					{
+						if (param=="frz_slow_down" || param=="frz_time" || param=="frz_damage")
+						{
+							
+							objects.towers_upg_text_array[ind].text="upgrade freeze\nchance first";
+							not_yet=1;
+						}		
+					}
+					
+					
 					//проверяем если деньги есть на апгрейды
-					if (new_val_price>screen_3.money)
+					if (new_val_price>screen_3.money || not_yet==1)
 					{
 						objects.towers_upg_text_array[ind].alpha=0.3;	
 						objects.upg_bcg_array[ind].pointerdown=null;									
@@ -858,12 +884,11 @@ class tower_control_class
 		//скрываем стрелку вверх
 		objects.up_icons[this.id].visible=false;
 		
-
-		
 	}
 	
 	buy_tower_down(i)
 	{
+		
 		
 		var c_price=init_tower_parameters.price[0];
 		if (screen_3.money<c_price)
@@ -912,6 +937,11 @@ class tower_control_class
 		
 		//отправляем сообщение что была построена новая башня
 		screen_3.send_message("new tower built",blue);
+		
+		//скрываем все чтобы открыто около башни
+		//this.hide_attributes();
+		tower_control_class.selected_tower=-1;
+	
 		
 	}
 	
@@ -979,6 +1009,7 @@ class tower_control_class
 		//проверяем апргейды только для башень а не для слотов
 		if (this.type==slot)
 			return;
+		
 		
 		//проверяем наличие апгрейда
 		objects.up_icons[this.id].visible=false;
@@ -1191,7 +1222,7 @@ class screen_2_class
 		this.id=id;
 		
 				
-		this.crystals=910;
+		this.crystals=0;
 		this.crystals_spent=0;
 		this.crystals_mined=0;
 		
@@ -1218,7 +1249,18 @@ class screen_2_class
 				objects[obj_name].visible=true;		
 				eval(load_list[this.id][i][5]);
 			}		
+			
+			if (obj_class=="sprite_array" ) 
+			{
+				
+				var a_size=load_list[this.id][i][2];
+				for (var n=0;n<a_size;n++)
+					eval(load_list[this.id][i][5]);		
+				
+			}
+		
 		}
+		
 				
 		//отображаем апгрейды
 		this.redraw_upg_text();
@@ -1250,7 +1292,6 @@ class screen_2_class
 		objects.crystal_info.text="Crystals: "+this.crystals;
 		
 		
-		
 		var ind=0;
 		for (var param in tower_upgrades)
 		{
@@ -1258,23 +1299,43 @@ class screen_2_class
 			if (upg_lev==tower_upgrades[param].length-1)
 			{
 				objects["c_upg_"+ind].pointerdown=null;
-				objects["text_info_"+ind].text="no more/nupgrades";	
+				objects["text_info"][ind].text="no more/nupgrades";	
 				objects["c_upg_"+ind].alpha=0.25;
-				objects["text_info_"+ind].alpha=0.25;
+				objects["text_info"][ind].alpha=0.25;
 			}
 			else
 			{
-				objects["c_upg_"+ind].pointerdown=this.upg_icon_down.bind(this,ind);
-				objects["c_upg_"+ind].alpha=1;
-				objects["text_info_"+ind].alpha=1;
+
 				
 				var cur_lev=this.upgrade_levels[param];
 				var cur_val=tower_upgrades[param][cur_lev][0];				
 				var new_val=tower_upgrades[param][cur_lev+1][0];					
 				new_val=Number((new_val).toFixed(2));
-				var upg_price=tower_upgrades[param][cur_lev+1][2];		
-				objects["text_info_"+ind].text=init_tower_parameters[param][1] + "\n"+cur_val+" > "+new_val +"\ncost: "+upg_price;					
+				var upg_price=tower_upgrades[param][cur_lev+1][2];
+				objects["text_info"][ind].text=init_tower_parameters[param][1] + "\n"+cur_val+" > "+new_val +"\ncost: "+upg_price;					
+				
+				if (this.crystals>=upg_price)
+				{
+					objects["c_upg_"+ind].pointerdown=this.upg_icon_down.bind(this,ind);
+					objects["c_upg_"+ind].alpha=1;
+					objects["text_info"][ind].alpha=1;	
+					objects["c_frame"][ind].alpha=1;						
+				}
+				else
+				{
+					objects["c_upg_"+ind].pointerdown=null;
+					objects["c_upg_"+ind].alpha=0.25;
+					objects["text_info"][ind].alpha=0.25;		
+					objects["c_frame"][ind].alpha=0.25;	
+				}
+
+			
+				
 			}
+			
+			//отображаем уровень достижения апгрейда
+			var max_upg=tower_upgrades[param].length;
+			objects.c_bar[ind].scale.x=upg_lev/(max_upg-1);	
 			
 			ind++;
 		}
@@ -1282,7 +1343,7 @@ class screen_2_class
 		
 	send_message(text,col=blue)
 	{
-		
+		/*
 		if (col==blue)
 		{
 			objects.message_box.texture=game_res.resources["messgage_box_b"].texture;			
@@ -1296,6 +1357,7 @@ class screen_2_class
 		objects.message_box.visible=true;
 		objects.message_box_text.visible=true;
 		objects.message_box_text.text=text;
+		*/
 		
 	}
 	
@@ -1488,7 +1550,7 @@ class screen_3_class
 		emojies.forEach(e=>e.set_state(e_inactive));
 		
 		//устанавливаем и отображаем баланс
-		this.money=130;
+		this.money=230;
 		this.prv_money=this.money;
 		this.change_balance(0);
 		
@@ -1680,41 +1742,6 @@ class screen_3_class
 		//скрываем все башни и их аттрибуты
 		towers.forEach(e=>e.hide_attributes());
 		tower_control_class.selected_tower=-1;
-		
-		var mx=app.renderer.plugins.interaction.eventData.data.global.x/app.stage.scale.x;
-		var my=app.renderer.plugins.interaction.eventData.data.global.y/app.stage.scale.y;
-				
-
-		
-		//проверяем выделеного эмодзи чтобы отобразить его параметры
-		/*
-		for (var e = 0; e < emojies.length; e++)
-		{
-			if (emojies[e].emoji.visible==true)
-			{
-				var dx = emojies[e].emoji.x - mx;
-				var dy = emojies[e].emoji.y - my;
-				var dist = Math.sqrt(dx * dx + dy * dy);
-				if (dist < 17)
-				{
-					objects.emoji_view.visible=true;
-					objects.emoji_view.texture=game_res.resources["em"+emojies[e].emoji_face].texture;
-					
-					
-					var p0=100-emoji_params[emojies[e].emoji_face][2]*100+"%";
-					var p1=100-emoji_params[emojies[e].emoji_face][3]*100+"%";
-					var p2=100-emoji_params[emojies[e].emoji_face][4]*100+"%";
-					var p3=100-emoji_params[emojies[e].emoji_face][5]*100+"%";
-					var bonus=emoji_params[emojies[e].emoji_face][0];
-					
-					objects.emoji_info.text=t_names_long[0]+": "+p0+"\n\n"+t_names_long[1]+": "+p1+"\n\n"+t_names_long[2]+": "+p2+"\n\n"+t_names_long[3]+": "+p3+"\n\nkill bonus: "+bonus;
-					objects.emoji_info.visible=true;
-
-					return;					
-				}
-			}
-		}
-		*/
 	}
 
 	change_balance(amount)
@@ -1797,7 +1824,32 @@ function resize()
 }
 
 
-
+function preload_ok()
+{
+	
+	
+	var rParams = FAPI.Util.getRequestParameters();
+	console.log(rParams);
+	FAPI.init(rParams["api_server"], rParams["apiconnection"],
+			  /*
+			  * Первый параметр:
+			  * функция, которая будет вызвана после успешной инициализации.
+			  */
+			  function() {
+				  alert("Success");
+				  // здесь можно вызывать методы API
+				  load();
+			  },
+			  /*
+			  * Второй параметр:
+			  * функция, которая будет вызвана, если инициализация не удалась.
+			  */
+			  function(error) {
+				  alert(error);
+			  }
+	);	
+	
+}
 
 
 function load()

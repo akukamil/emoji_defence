@@ -2,3 +2,6 @@ for (var i=0;i<11;i++)
 {
 objects.towers_upg_text_array[i].style.fill=0xFFFFFF;
 }
+objects.gate_level.style.fill=0xC55A17;
+objects.money_balance.style.fill=0xC55A17;
+objects.wave_info.style.fill=0xC55A17;

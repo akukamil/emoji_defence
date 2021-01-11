@@ -1388,6 +1388,13 @@ class screen_2_class
 
 	}
 
+
+	buy()
+	{
+		
+		FAPI.UI.showPayment("Яблоко", "Это очень вкусно!", 777, 1, null, null, "ok", "true");
+		
+	}
 	reset_down()
 	{
 		this.upgrade_levels={"range":0,"rate":0,"damage":0,"count":0,"tlp_chance":0,"tlp_damage":0,"tlp_dist":0,"frz_chance":0,"frz_slow_down":0,"frz_time":0,"frz_damage":0};
@@ -1823,13 +1830,12 @@ function resize()
     app.stage.scale.set(nvw / M_WIDTH, nvh / M_HEIGHT);
 }
 
-
 function preload_ok()
 {
 	
 	
 	var rParams = FAPI.Util.getRequestParameters();
-	console.log(rParams);
+
 	FAPI.init(rParams["api_server"], rParams["apiconnection"],
 			  /*
 			  * Первый параметр:
@@ -1846,11 +1852,11 @@ function preload_ok()
 			  */
 			  function(error) {
 				  alert(error);
+				  load();
 			  }
 	);	
 	
 }
-
 
 function load()
 {

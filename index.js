@@ -1970,8 +1970,7 @@ function resize()
 
 function preload_ok()
 {
-	load();
-	return;
+
 	var rParams = FAPI.Util.getRequestParameters();
 
 	FAPI.init(rParams["api_server"], rParams["apiconnection"],

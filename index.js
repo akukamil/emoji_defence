@@ -3,14 +3,19 @@ var app, game_res, game_tick=0, objects={}, towers=[], emojies=[], bullets=[], e
 var screen_0, screen_1, screen_2, screen_3;
 g_process=function(){};
 
+var ok_loaded=0;
 
-var tower_upgrades={"range":[[100,0,0],[110,5,3],[120,7,3],[130,9,3],[140,11,3],[150,13,3],[160,15,3],[170,17,3],[180,19,3],[190,21,3],[200,23,3],[210,25,3],[220,27,3],[230,29,3],[240,31,3],[250,33,3]],"rate":[[1,0,0],[1.1,5,3],[1.2,7,3],[1.3,9,3],[1.4,11,3],[1.5,13,3],[1.6,15,3],[1.7,17,3],[1.8,19,3],[1.9,21,3],[2,23,3],[2.1,25,3],[2.2,27,3],[2.3,29,3],[2.4,31,3],[2.5,33,3]],"damage":[[25,0,0],[30,5,3],[35,7,3],[40,9,3],[45,11,3],[50,13,3],[55,15,3],[60,17,3],[65,19,3],[70,21,3],[75,23,3],[80,25,3],[85,27,3],[90,29,3],[95,31,3],[100,33,3]],"count":[[1,0,0],[2,20,3],[3,22,3]],"tlp_chance":[[0,0,0],[0.03,5,3],[0.06,7,3],[0.09,9,3],[0.12,11,3],[0.15,13,3],[0.18,15,3],[0.21,17,3],[0.24,19,3],[0.27,21,3],[0.3,23,3],[0.33,25,3],[0.36,27,3],[0.39,29,3],[0.42,31,3],[0.45,33,3]],"tlp_damage":[[0,0,0],[5,5,3],[10,7,3],[15,9,3],[20,11,3],[25,13,3],[30,15,3],[35,17,3],[40,19,3],[45,21,3],[50,23,3],[55,25,3],[60,27,3],[65,29,3],[70,31,3],[75,33,3]],"tlp_dist":[[50,0,0],[60,5,3],[70,7,3],[80,9,3],[90,11,3],[100,13,3],[110,15,3],[120,17,3],[130,19,3],[140,21,3],[150,23,3],[160,25,3],[170,27,3],[180,29,3],[190,31,3],[200,33,3]],"frz_chance":[[0,0,0],[0.03,5,3],[0.06,7,3],[0.09,9,3],[0.12,11,3],[0.15,13,3],[0.18,15,3],[0.21,17,3],[0.24,19,3],[0.27,21,3],[0.3,23,3],[0.33,25,3],[0.36,27,3],[0.39,29,3],[0.42,31,3],[0.45,33,3]],"frz_slow_down":[[0.2,0,0],[0.25,5,3],[0.3,7,3],[0.35,9,3],[0.4,11,3],[0.45,13,3],[0.5,15,3],[0.55,17,3],[0.6,19,3],[0.65,21,3],[0.7,23,3],[0.75,25,3],[0.8,27,3],[0.85,29,3],[0.9,31,3],[0.95,33,3]],"frz_time":[[2,0,0],[2.2,5,3],[2.4,7,3],[2.6,9,3],[2.8,11,3],[3,13,3],[3.2,15,3],[3.4,17,3],[3.6,19,3],[3.8,21,3],[4,23,3],[4.2,25,3],[4.4,27,3],[4.6,29,3],[4.8,31,3],[5,33,3]],"frz_damage":[[0.2,0,0],[0.25,5,3],[0.3,7,3],[0.35,9,3],[0.4,11,3],[0.45,13,3],[0.5,15,3],[0.55,17,3],[0.6,19,3],[0.65,21,3],[0.7,23,3],[0.75,25,3],[0.8,27,3],[0.85,29,3],[0.9,31,3],[0.95,33,3]]};
+var tower_upgrades={"range":[[100,0,0],[110,5,3],[120,8,3],[130,11,3],[140,14,4],[150,17,4],[160,20,4],[170,23,4],[180,26,5],[190,29,5],[200,32,5],[210,35,5],[220,38,5],[230,41,5],[240,44,5],[250,47,5]],"rate":[[1,0,0],[1.1,5,3],[1.2,8,3],[1.3,11,3],[1.4,14,4],[1.5,17,4],[1.6,20,4],[1.7,23,4],[1.8,26,5],[1.9,29,5],[2,32,5],[2.1,35,5],[2.2,38,5],[2.3,41,5],[2.4,44,5],[2.5,47,5]],"damage":[[25,0,0],[30,5,3],[35,8,3],[40,11,3],[45,14,4],[50,17,4],[55,20,4],[60,23,4],[65,26,5],[70,29,5],[75,32,5],[80,35,5],[85,38,5],[90,41,5],[95,44,5],[100,47,5]],"count":[[1,0,0],[2,20,10],[3,23,10]],"tlp_chance":[[0,0,0],[0.03,5,3],[0.06,8,3],[0.09,11,3],[0.12,14,4],[0.15,17,4],[0.18,20,4],[0.21,23,4],[0.24,26,5],[0.27,29,5],[0.3,32,5],[0.33,35,5],[0.36,38,5],[0.39,41,5],[0.42,44,5],[0.45,47,5]],"tlp_damage":[[0,0,0],[5,5,3],[10,8,3],[15,11,3],[20,14,4],[25,17,4],[30,20,4],[35,23,4],[40,26,5],[45,29,5],[50,32,5],[55,35,5],[60,38,5],[65,41,5],[70,44,5],[75,47,5]],"tlp_dist":[[70,0,0],[80,5,3],[90,8,3],[100,11,3],[110,14,4],[120,17,4],[130,20,4],[140,23,4],[150,26,5],[160,29,5],[170,32,5],[180,35,5],[190,38,5],[200,41,5],[210,44,5],[220,47,5]],"frz_chance":[[0,0,0],[0.03,5,3],[0.06,8,3],[0.09,11,3],[0.12,14,4],[0.15,17,4],[0.18,20,4],[0.21,23,4],[0.24,26,5],[0.27,29,5],[0.3,32,5],[0.33,35,5],[0.36,38,5],[0.39,41,5],[0.42,44,5],[0.45,47,5]],"frz_slow_down":[[0.2,0,0],[0.25,5,3],[0.3,8,3],[0.35,11,3],[0.4,14,4],[0.45,17,4],[0.5,20,4],[0.55,23,4],[0.6,26,5],[0.65,29,5],[0.7,32,5],[0.75,35,5],[0.8,38,5],[0.85,41,5],[0.9,44,5],[0.95,47,5]],"frz_time":[[2,0,0],[2.2,5,3],[2.4,8,3],[2.6,11,3],[2.8,14,4],[3,17,4],[3.2,20,4],[3.4,23,4],[3.6,26,5],[3.8,29,5],[4,32,5],[4.2,35,5],[4.4,38,5],[4.6,41,5],[4.8,44,5],[5,47,5]],"frz_damage":[[0.2,0,0],[0.25,5,3],[0.3,8,3],[0.35,11,3],[0.4,14,4],[0.45,17,4],[0.5,20,4],[0.55,23,4],[0.6,26,5],[0.65,29,5],[0.7,32,5],[0.75,35,5],[0.8,38,5],[0.85,41,5],[0.9,44,5],[0.95,47,5]]};
 
-var init_tower_parameters={"price":[10,"price"],"range":[100,"range"],"rate":[1,"rate of fire"],"damage":[25,"damage"],"count":[1,"double/triple fire"],"tlp_chance":[0,"chance of teleport"],"tlp_damage":[0,"damage when teleport"],"tlp_dist":[50,"teleport distance"],"frz_chance":[0,"chance of freeze"],"frz_slow_down":[0.2,"slow down when freeze"],"frz_time":[2,"freeze duration"],"frz_damage":[0.2,"freeze damage"]};
+
+var init_tower_parameters={"price":[10,"цена"],"range":[100,"радиус дейтсвия"],"rate":[1,"скорость"],"damage":[25,"урон"],"count":[1,"двойной огонь"],"tlp_chance":[0,"вероятность телепорта"],"tlp_damage":[0,"урон при телепорте"],"tlp_dist":[50,"расстояние телепорта"],"frz_chance":[0,"вероятность заморозки"],"frz_slow_down":[0.2,"замедление при заморозке"],"frz_time":[2,"время заморозки"],"frz_damage":[0.2,"урон при заморозке"]};
+
+
 
 var ind_to_param={0:"range",1:"rate",2:"damage",3:"count",4:"tlp_chance",5:"tlp_damage",6:"tlp_dist",7:"frz_chance",8:"frz_slow_down",9:"frz_time",10:"frz_damage"};
 
-var emoji_params=[[1,0.7,1,1,1,1,3600,1],[1,0.72,0.8,0.8,0.8,0.8,3600,1],[1,0.74,0.64,0.64,0.64,0.64,3600,1],[2,0.76,0.51,0.51,0.51,0.51,4,2],[2,0.78,1,0.41,1,0.41,3600,1],[2,0.8,0.33,0.8,0.33,0.8,3600,1],[2,0.82,0.26,0.26,0.64,0.26,3600,1],[3,0.84,0.21,0.51,0.21,0.21,4,2],[3,0.86,0.17,0.17,0.17,0.17,3600,1],[3,0.88,0.33,0.13,0.26,0.13,4,2],[3,0.9,0.11,0.11,0.11,0.11,3600,1],[3,0.92,0.09,0.21,0.09,0.09,3600,1],[3,0.94,0.41,0.07,0.07,0.07,4,2],[4,0.96,0.11,0.05,0.11,0.13,3600,1],[4,0.98,0.04,0.17,0.11,0.09,3600,1]];
+var emoji_params=[[1,0.7,1,1,1,1,3600,1],[1,0.72,0.8,1,0.8,0.8,3600,1],[1,0.74,0.64,1,0.64,0.64,3600,1],[3,0.76,0.51,1,0.51,0.51,4,2],[3,0.78,1,1,1,0.41,3600,1],[3,0.8,0.33,0,0.33,0.8,3600,1],[3,0.82,0.26,1,0.64,0.26,3600,1],[4,0.84,0.21,1,0.21,0.21,4,2],[4,0.86,0.17,0,0.17,0.17,3600,1],[4,0.88,0.33,1,0.26,0.13,4,2],[4,0.9,0.11,1,0.11,0.11,3600,1],[4,0.92,0.09,0,0.09,0.09,3600,1],[4,0.94,0.41,1,0.07,0.07,4,2],[5,0.96,0.11,1,0.11,0.13,3600,1],[5,0.98,0.04,0,0.11,0.09,3600,1]];
+
 
 
 
@@ -55,6 +60,9 @@ class bullet_class
 		this.parent_tower_id=parent_tower_id;
 		this.tar_emoji=tar_emoji;
 		this.type=type;		
+		
+
+		
 	}
 	
 	process()
@@ -209,7 +217,7 @@ class emoji_class
 		this.spd=emoji_params[emoji_face][1];
 		
 		this.susceptibility_bullet=emoji_params[emoji_face][2];
-		this.susceptibility_laser=emoji_params[emoji_face][3];
+		this.susceptibility_teleport_prob=emoji_params[emoji_face][3];
 		this.susceptibility_teleport=emoji_params[emoji_face][4];
 		this.susceptibility_freeze=emoji_params[emoji_face][5];
 		
@@ -322,7 +330,13 @@ class emoji_class
 			screen_3.completed_emoji += 1;
 			screen_3.change_balance(this.bonus);
 			screen_3.place_explosion(this.emoji.x,this.emoji.y);
-			this.set_state(e_inactive);			
+			this.set_state(e_inactive);		
+			
+			//проигрываем звук
+			var i=game_res.resources.mp3_killed.sound.instances.length;
+			if (i<7)
+				game_res.resources.mp3_killed.sound.play();
+
 		}
 	}
 		
@@ -335,12 +349,7 @@ class emoji_class
 			this.make_me_red();
 	}
 	
-	damage_laser(amount)
-	{		
-		this.damage(amount*this.susceptibility_laser);
-		this.make_me_red();
-	}
-	
+
 	damage_teleport(amount)
 	{		
 		this.damage(amount*this.susceptibility_teleport);
@@ -395,11 +404,14 @@ class emoji_class
 			
 				//вероятно
 				var rnd=Math.random();
-				if (rnd>this.susceptibility_teleport)
+				if (rnd>this.susceptibility_teleport_prob)
 				{
 					this.state=e_go;					
 					return;
 				}
+				
+				//проигрываем звук
+				game_res.resources.mp3_teleport.sound.play();
 			
 				this.t_dist=arg1;
 				this.t_damage=arg2;				
@@ -721,6 +733,9 @@ class tower_control_class
 	show_upgrades(as_pressed=false)
 	{		
 	
+	
+
+	
 		//скрываем все что открыто
 		towers.forEach(e=>e.hide_attributes())
 		
@@ -728,9 +743,14 @@ class tower_control_class
 		if (tower_control_class.selected_tower==this.id && as_pressed==true)
 		{
 			
+			game_res.resources.mp3_tower_down.sound.play();
+			
 			tower_control_class.selected_tower=-1;
 			return;			
 		}
+		
+		
+
 		
 		if (this.type==slot)
 		{			
@@ -741,6 +761,10 @@ class tower_control_class
 		}
 		else
 		{
+			
+			//играем звук только если это новое открытие
+			if (tower_control_class.selected_tower!=this.id)
+				game_res.resources.mp3_tower_down.sound.play();
 			
 			//устанавливаем на место башни круг радиуса дейтсвия
 			objects.range_circle.visible=true;
@@ -795,9 +819,9 @@ class tower_control_class
 				//проверяем наличие апгрейдов
 				if (cur_lev==max_upg-1)
 				{					
-					objects.towers_upg_text_array[ind].text="No more upgrades";
+					objects.towers_upg_text_array[ind].text="Больше нету";
 					objects.towers_upg_text_array[ind].alpha=0.3;	
-					objects.upg_bcg_array[ind].pointerdown=null;	
+					objects.upg_bcg_array[ind].pointerdown=function(){game_res.resources.mp3_error.sound.play();};	
 				}
 				else
 				{					
@@ -806,7 +830,7 @@ class tower_control_class
 					var new_val_price=tower_upgrades[param][cur_lev+1][1];	
 					var long_param_name=init_tower_parameters[param][1];
 
-					objects.towers_upg_text_array[ind].text=long_param_name + "\n"+cur_val+" > "+new_val+"\n                         BUY ( "+new_val_price+"$ )";
+					objects.towers_upg_text_array[ind].text=long_param_name + "\n"+cur_val+" > "+new_val+"\n               КУПИТЬ ( "+new_val_price+"$ )";
 					
 					
 					//проверяем что нельзя покупать апгрейды которые не возможно использовать
@@ -816,7 +840,7 @@ class tower_control_class
 						if (param=="tlp_damage" || param=="tlp_dist")
 						{
 							
-							objects.towers_upg_text_array[ind].text="upgrade teleport\nchance first";
+							objects.towers_upg_text_array[ind].text="Сначала вероятность\nтелепорта купи";
 							not_yet=1;
 						}						
 					}
@@ -826,7 +850,7 @@ class tower_control_class
 						if (param=="frz_slow_down" || param=="frz_time" || param=="frz_damage")
 						{
 							
-							objects.towers_upg_text_array[ind].text="upgrade freeze\nchance first";
+							objects.towers_upg_text_array[ind].text="Сначала вероятность\nзаморозки купи";
 							not_yet=1;
 						}		
 					}
@@ -836,7 +860,7 @@ class tower_control_class
 					if (new_val_price>screen_3.money || not_yet==1)
 					{
 						objects.towers_upg_text_array[ind].alpha=0.3;	
-						objects.upg_bcg_array[ind].pointerdown=null;									
+						objects.upg_bcg_array[ind].pointerdown=function(){game_res.resources.mp3_error.sound.play();};									
 					}
 					else
 					{
@@ -867,7 +891,10 @@ class tower_control_class
 	
 	sell_down()
 	{	
-	
+		//проигрываем звук
+		game_res.resources.mp3_sell.sound.play();
+		
+		
 		//скрываем все чтобы открыто около башни
 		this.hide_attributes();
 		tower_control_class.selected_tower=-1;
@@ -889,11 +916,13 @@ class tower_control_class
 	buy_tower_down(i)
 	{
 		
+		//проигрываем звук
+		game_res.resources.mp3_tower_built.sound.play();
 		
 		var c_price=init_tower_parameters.price[0];
 		if (screen_3.money<c_price)
 		{			
-			screen_3.send_message("You need "+c_price+"$ to build this tower",red);
+			screen_3.send_message("Нужно "+c_price+"$ чтобы построить башню",red);
 			return;
 		}
 		
@@ -936,7 +965,7 @@ class tower_control_class
 		this.sec_check=game_tick;		
 		
 		//отправляем сообщение что была построена новая башня
-		screen_3.send_message("new tower built",blue);
+		screen_3.send_message("Построена новая башня",blue);
 		
 		//скрываем все чтобы открыто около башни
 		//this.hide_attributes();
@@ -971,7 +1000,10 @@ class tower_control_class
 		var new_val=tower_upgrades[param][cur_lev+1][0];			
 		var new_val_price=tower_upgrades[param][cur_lev+1][1];	
 
-				
+		//проигрываем звук
+		game_res.resources.mp3_upgrade_down.sound.play();
+
+
 	
 		//обновляем балансы и стоимости
 		screen_3.change_balance(-new_val_price);
@@ -979,7 +1011,7 @@ class tower_control_class
 		
 		this[param]=new_val;
 		var long_param_name=init_tower_parameters[param][1];
-		screen_3.send_message(long_param_name+" upgraded: "+cur_val+" >>> "+new_val,blue);
+		screen_3.send_message(long_param_name+" улучшен(а): "+cur_val+" >>> "+new_val,blue);
 		
 		//увеличиваем уровень апгрейда
 		this.upgrade_levels[param]++;
@@ -1058,7 +1090,15 @@ class tower_control_class
 			//стреляем в емодзи
 			var num_of_targets=Math.min(this.count, this.emoji_in_range_count);
 			if (num_of_targets>0)
-			{				
+			{			
+
+				//проигрываем звук
+				var i=game_res.resources.mp3_bullet.sound.instances.length;
+				if (i<7)
+					game_res.resources.mp3_bullet.sound.play();
+				
+
+				
 				for (var i=0;i<num_of_targets;i++)
 				{
 					var r_num=Math.random();
@@ -1105,7 +1145,10 @@ class screen_0_class
 			var obj_name=load_list[this.id][i][1];
 			
 			if (obj_class=="block" || obj_class=="sprite" || obj_class=="text" ) 
-				objects[obj_name].visible=true;			
+			{
+				objects[obj_name].visible=true;		
+				eval(load_list[this.id][i][5]);
+			}		
 		}
 		
 	}
@@ -1168,10 +1211,15 @@ class screen_1_class
 	
 	map_down(i)
 	{
+		//проигрываем звук
+		game_res.resources.mp3_click.sound.play();
+		
 		this.selected_map=i;
 		objects.selected_window.visible=true;
 		objects.selected_window.x=objects["map_"+i].x;
 		objects.selected_window.y=objects["map_"+i].y;
+		
+		
 	}
 	
 	set_level_status(level)
@@ -1200,16 +1248,34 @@ class screen_1_class
 
 	button_2_down()
 	{
+		
+		
+		
 		if (this.selected_map==0)
 		{
+			//проигрываем звук
+			game_res.resources.mp3_game_start.sound.play();
+			
 			screen_3.load(this.selected_map);			
 		}
 		else
 		{
-			//if (this.results[this.selected_map-1]>0)
-				screen_3.load(this.selected_map);	
-			//else
-			//	screen_3.send_message("Complete previous maps",red);
+			if (this.results[this.selected_map-1]>0)
+			{
+				
+				//проигрываем звук
+				game_res.resources.mp3_game_start.sound.play();
+			
+				screen_3.load(this.selected_map);					
+			}
+			else
+			{
+				//проигрываем звук
+				game_res.resources.mp3_error.sound.play();
+			
+				screen_3.send_message("Нужно завершить предыдущие уровни",red);				
+			}
+
 		}
 	}
 
@@ -1248,6 +1314,7 @@ class screen_2_class
 			{
 				objects[obj_name].visible=true;		
 				eval(load_list[this.id][i][5]);
+				
 			}		
 			
 			if (obj_class=="sprite_array" ) 
@@ -1289,7 +1356,7 @@ class screen_2_class
 	{
 		
 		//отображаем количество кристалов
-		objects.crystal_info.text="Crystals: "+this.crystals;
+		objects.crystal_info.text="Кристаллы: "+this.crystals;
 		
 		
 		var ind=0;
@@ -1316,14 +1383,15 @@ class screen_2_class
 				
 				if (this.crystals>=upg_price)
 				{
-					objects["c_upg_"+ind].pointerdown=this.upg_icon_down.bind(this,ind);
+					objects["c_frame"][ind].pointerdown=this.upg_icon_down.bind(this,ind);
 					objects["c_upg_"+ind].alpha=1;
 					objects["text_info"][ind].alpha=1;	
 					objects["c_frame"][ind].alpha=1;						
 				}
 				else
-				{
-					objects["c_upg_"+ind].pointerdown=null;
+				{	
+		
+					objects["c_frame"][ind].pointerdown=function(){game_res.resources.mp3_error.sound.play();};
 					objects["c_upg_"+ind].alpha=0.25;
 					objects["text_info"][ind].alpha=0.25;		
 					objects["c_frame"][ind].alpha=0.25;	
@@ -1378,8 +1446,12 @@ class screen_2_class
 			this.upgrade_levels[param]++;		
 			this.crystals-=upg_price;
 			this.crystals_spent+=upg_price;	
-			this.send_message(init_tower_parameters[param][1]+" upgraded:\n"+cur_val+" >>> "+ new_val, blue);	
+			this.send_message(init_tower_parameters[param][1]+" улучшен(а):\n"+cur_val+" >>> "+ new_val, blue);	
 			this.redraw_upg_text();	
+			
+			
+			//проигрываем звук
+			game_res.resources.mp3_upgrade_down.sound.play();
 		}
 		else
 		{
@@ -1388,32 +1460,44 @@ class screen_2_class
 
 	}
 
-	
-
 	buy()
 	{
-		
-		FAPI.UI.showPayment("Яблоко", "Это очень вкусно!", 777, 1, null, null, "ok", "true");
+		if (ok_loaded==1)
+		{
+			FAPI.UI.showPayment("Кристаллы", "Покупай апгрейды за кристаллы!", 1, 100, null, null, "ok", "true");			
+		}
+		else
+		{
+			//проигрываем звук
+			game_res.resources.mp3_error.sound.play();			
+		}
+
 		
 	}
+	
 	reset_down()
 	{
+		
+		//проигрываем звук
+		game_res.resources.mp3_click.sound.play();
+		
 		this.upgrade_levels={"range":0,"rate":0,"damage":0,"count":0,"tlp_chance":0,"tlp_damage":0,"tlp_dist":0,"frz_chance":0,"frz_slow_down":0,"frz_time":0,"frz_damage":0};
 	
 		this.crystals+=this.crystals_spent;
 		this.crystals_spent=0;
 		this.redraw_upg_text();
 		
-		this.send_message("All upgrades reset",blue);	
+		this.send_message("Все параметры сброшены к начальным",blue);	
 	}
 }
 
 function API_callback(method, result, data)
 {
-	
-        var str = "{ \"method\": \"" + method + "\", \"result\": \"" + result + "\", \"data\": \"" + data + "\",}";
-        console.log(str);
-	
+	if (method=="showPayment" && result=="ok")
+	{
+		screen_2.crystals+=10;	
+		screen_2.redraw_upg_text()
+	}		
 }
 
 class screen_3_class
@@ -1511,6 +1595,16 @@ class screen_3_class
 				objects[obj_name].visible=true;						
 				eval(load_list[this.id][i][5]);
 			}
+			
+			if (obj_class=="sprite_array" ) 
+			{
+				
+				var a_size=load_list[this.id][i][2];
+				for (var n=0;n<a_size;n++)
+					eval(load_list[this.id][i][5]);		
+				
+			}
+			
 		}
 		
 		//эти параметры индивидуальны для каждой карты
@@ -1560,13 +1654,13 @@ class screen_3_class
 		
 		//основной уровень игры
 		this.gate_level=3;
-		this.damage_gate(0);
+		objects.gate_level.text=this.gate_level
 		
 		//отключаем все эмодзи
 		emojies.forEach(e=>e.set_state(e_inactive));
 		
 		//устанавливаем и отображаем баланс
-		this.money=230;
+		this.money=30;
 		this.prv_money=this.money;
 		this.change_balance(0);
 		
@@ -1661,9 +1755,18 @@ class screen_3_class
 		//ежесекундная проверка событий
 		if (game_tick>this.sec_check+1)
 		{
+			
+			//console.log(game_res.resources.mp3_click.sound.isPlaying);
+			
 			//failed
 			if (this.gate_level<=0)
 			{
+				
+				
+				//проигрываем звук
+				game_res.resources.mp3_failed.sound.play();
+				
+				
 				objects.block_scr.visible=true;
 				//objects.resume_button.visible=true;
 				objects.back_button2.visible=true;
@@ -1676,6 +1779,11 @@ class screen_3_class
 			//win
 			if (this.completed_emoji==this.schedule_size && this.gate_level>0)
 			{
+				
+				//проигрываем звук
+				game_res.resources.mp3_win.sound.play();
+				
+				
 				screen_1.set_level_status(this.gate_level);
 				objects.block_scr.visible=true;
 				//objects.resume_button.visible=true;
@@ -1683,6 +1791,7 @@ class screen_3_class
 				objects.restart_button.visible=true;
 				objects.finish_notice.visible=true;
 				objects.finish_notice.texture=game_res.resources['lev_com_'+this.gate_level].texture;
+				g_process=this.process_gameover;
 			}
 			
 			
@@ -1698,6 +1807,12 @@ class screen_3_class
 	{
 		this.gate_level-=amount;
 		objects.gate_level.text=this.gate_level
+		
+		
+		//проигрываем звук
+		if (this.gate_level>0)
+			game_res.resources.mp3_warning.sound.play();
+		
 	}
 	
 	process_pause()
@@ -1715,6 +1830,12 @@ class screen_3_class
 	
 	pause_down()
 	{
+		//проигрываем звук
+		game_res.resources.mp3_click.sound.play();
+		
+		
+		
+		
 		explosions.forEach(e=>e.expl.stop());
 		objects.block_scr.visible=true;
 		objects.resume_button.visible=true;
@@ -1728,6 +1849,10 @@ class screen_3_class
 
 	resume_down()
 	{
+		
+		//проигрываем звук
+		game_res.resources.mp3_click.sound.play();
+		
 		explosions.forEach(e=>e.expl.play());
 		
 		objects.block_scr.visible=false;
@@ -1741,6 +1866,8 @@ class screen_3_class
 	
 	back_button2_down()
 	{
+		//проигрываем звук
+		game_res.resources.mp3_click.sound.play();
 		
 		screen_1.draw_and_init();
 		
@@ -1748,6 +1875,8 @@ class screen_3_class
 	
 	restart_down()
 	{
+		//проигрываем звук
+		game_res.resources.mp3_click.sound.play();
 		
 		this.load(this.map_id);
 		
@@ -1841,26 +1970,21 @@ function resize()
 
 function preload_ok()
 {
-	
-	
+	load();
+	return;
 	var rParams = FAPI.Util.getRequestParameters();
 
 	FAPI.init(rParams["api_server"], rParams["apiconnection"],
-			  /*
-			  * Первый параметр:
-			  * функция, которая будет вызвана после успешной инициализации.
-			  */
-			  function() {
-				  alert("Success");
-				  // здесь можно вызывать методы API
+
+			  function()
+			  {
+				  ok_loaded=1;
 				  load();
 			  },
-			  /*
-			  * Второй параметр:
-			  * функция, которая будет вызвана, если инициализация не удалась.
-			  */
-			  function(error) {
-				  alert(error);
+
+			  function(error)
+			  {
+				  ok_loaded=0;
 				  load();
 			  }
 	);	
@@ -1871,7 +1995,7 @@ function load()
 {
 					
 	//загружаем ресурсы в соответствии с листом загрузки
-	game_res=new PIXI.loaders.Loader();	
+	game_res=new PIXI.Loader();	
 	for (var l=0;l<load_list.length;l++)
 		for (var i=0;i<load_list[l].length;i++)
 			if (load_list[l][i][0]=="sprite" || load_list[l][i][0]=="image") 
@@ -1882,6 +2006,22 @@ function load()
 		for (var j=0;j<anim_list[i];j++)
 			game_res.add("expl_"+i+"_"+j, "res/explosions/"+i+"/"+j+".png");
 	
+	
+	//загружаем звуки
+	game_res.add('mp3_upgrade_down','res/sounds/upgrade_down_sound.mp3');
+	game_res.add('mp3_click','res/sounds/click.mp3');
+	game_res.add('mp3_tower_built','res/sounds/tower_built.mp3');
+	game_res.add('mp3_sell','res/sounds/sell.mp3');
+	game_res.add('mp3_tower_down','res/sounds/tower_down.mp3');
+	game_res.add('mp3_failed','res/sounds/failed.mp3');
+	game_res.add('mp3_game_start','res/sounds/game_start.mp3');
+	game_res.add('mp3_error','res/sounds/error.mp3');
+	game_res.add('mp3_win','res/sounds/win.mp3');
+	game_res.add('mp3_lose','res/sounds/lose.mp3');
+	game_res.add('mp3_bullet','res/sounds/bullet.mp3');
+	game_res.add('mp3_killed','res/sounds/killed.mp3');
+	game_res.add('mp3_warning','res/sounds/warning.mp3');
+	game_res.add('mp3_teleport','res/sounds/teleport.mp3');
 	
 	game_res.load(load_complete);		
 	game_res.onProgress.add(progress);

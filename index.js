@@ -8,7 +8,7 @@ var ok_loaded=0;
 var tower_upgrades={"range":[[100,0,0],[110,5,3],[120,8,3],[130,11,3],[140,14,4],[150,17,4],[160,20,4],[170,23,4],[180,26,5],[190,29,5],[200,32,5],[210,35,5],[220,38,5],[230,41,5],[240,44,5],[250,47,5]],"rate":[[1,0,0],[1.1,5,3],[1.2,8,3],[1.3,11,3],[1.4,14,4],[1.5,17,4],[1.6,20,4],[1.7,23,4],[1.8,26,5],[1.9,29,5],[2,32,5],[2.1,35,5],[2.2,38,5],[2.3,41,5],[2.4,44,5],[2.5,47,5]],"damage":[[25,0,0],[30,5,3],[35,8,3],[40,11,3],[45,14,4],[50,17,4],[55,20,4],[60,23,4],[65,26,5],[70,29,5],[75,32,5],[80,35,5],[85,38,5],[90,41,5],[95,44,5],[100,47,5]],"count":[[1,0,0],[2,20,10],[3,23,10]],"tlp_chance":[[0,0,0],[0.03,5,3],[0.06,8,3],[0.09,11,3],[0.12,14,4],[0.15,17,4],[0.18,20,4],[0.21,23,4],[0.24,26,5],[0.27,29,5],[0.3,32,5],[0.33,35,5],[0.36,38,5],[0.39,41,5],[0.42,44,5],[0.45,47,5]],"tlp_damage":[[0,0,0],[5,5,3],[10,8,3],[15,11,3],[20,14,4],[25,17,4],[30,20,4],[35,23,4],[40,26,5],[45,29,5],[50,32,5],[55,35,5],[60,38,5],[65,41,5],[70,44,5],[75,47,5]],"tlp_dist":[[70,0,0],[80,5,3],[90,8,3],[100,11,3],[110,14,4],[120,17,4],[130,20,4],[140,23,4],[150,26,5],[160,29,5],[170,32,5],[180,35,5],[190,38,5],[200,41,5],[210,44,5],[220,47,5]],"frz_chance":[[0,0,0],[0.03,5,3],[0.06,8,3],[0.09,11,3],[0.12,14,4],[0.15,17,4],[0.18,20,4],[0.21,23,4],[0.24,26,5],[0.27,29,5],[0.3,32,5],[0.33,35,5],[0.36,38,5],[0.39,41,5],[0.42,44,5],[0.45,47,5]],"frz_slow_down":[[0.2,0,0],[0.25,5,3],[0.3,8,3],[0.35,11,3],[0.4,14,4],[0.45,17,4],[0.5,20,4],[0.55,23,4],[0.6,26,5],[0.65,29,5],[0.7,32,5],[0.75,35,5],[0.8,38,5],[0.85,41,5],[0.9,44,5],[0.95,47,5]],"frz_time":[[2,0,0],[2.2,5,3],[2.4,8,3],[2.6,11,3],[2.8,14,4],[3,17,4],[3.2,20,4],[3.4,23,4],[3.6,26,5],[3.8,29,5],[4,32,5],[4.2,35,5],[4.4,38,5],[4.6,41,5],[4.8,44,5],[5,47,5]],"frz_damage":[[0.2,0,0],[0.25,5,3],[0.3,8,3],[0.35,11,3],[0.4,14,4],[0.45,17,4],[0.5,20,4],[0.55,23,4],[0.6,26,5],[0.65,29,5],[0.7,32,5],[0.75,35,5],[0.8,38,5],[0.85,41,5],[0.9,44,5],[0.95,47,5]]};
 
 
-var init_tower_parameters={"price":[10,"цена"],"range":[100,"радиус дейтсвия"],"rate":[1,"скорость"],"damage":[25,"урон"],"count":[1,"двойной огонь"],"tlp_chance":[0,"вероятность телепорта"],"tlp_damage":[0,"урон при телепорте"],"tlp_dist":[50,"расстояние телепорта"],"frz_chance":[0,"вероятность заморозки"],"frz_slow_down":[0.2,"замедление при заморозке"],"frz_time":[2,"время заморозки"],"frz_damage":[0.2,"урон при заморозке"]};
+var init_tower_parameters={"price":[10,"price"],"range":[100,"range"],"rate":[1,"rate of fire"],"damage":[25,"damage"],"count":[1,"double fire"],"tlp_chance":[0,"change of teleport"],"tlp_damage":[0,"damage when teleport"],"tlp_dist":[50,"teleport distance"],"frz_chance":[0,"freeze chance"],"frz_slow_down":[0.2,"freeze slow down"],"frz_time":[2,"freeze time"],"frz_damage":[0.2,"freeze damage"]};
 
 
 
@@ -819,7 +819,7 @@ class tower_control_class
 				//проверяем наличие апгрейдов
 				if (cur_lev==max_upg-1)
 				{					
-					objects.towers_upg_text_array[ind].text="Больше нету";
+					objects.towers_upg_text_array[ind].text="No more\nupgrades";
 					objects.towers_upg_text_array[ind].alpha=0.3;	
 					objects.upg_bcg_array[ind].pointerdown=function(){game_res.resources.mp3_error.sound.play();};	
 				}
@@ -830,7 +830,7 @@ class tower_control_class
 					var new_val_price=tower_upgrades[param][cur_lev+1][1];	
 					var long_param_name=init_tower_parameters[param][1];
 
-					objects.towers_upg_text_array[ind].text=long_param_name + "\n"+cur_val+" > "+new_val+"\n               КУПИТЬ ( "+new_val_price+"$ )";
+					objects.towers_upg_text_array[ind].text=long_param_name + "\n"+cur_val+" > "+new_val+"\n               BUY ( "+new_val_price+"$ )";
 					
 					
 					//проверяем что нельзя покупать апгрейды которые не возможно использовать
@@ -840,7 +840,7 @@ class tower_control_class
 						if (param=="tlp_damage" || param=="tlp_dist")
 						{
 							
-							objects.towers_upg_text_array[ind].text="Сначала вероятность\nтелепорта купи";
+							objects.towers_upg_text_array[ind].text="Buy teleport\nfirst";
 							not_yet=1;
 						}						
 					}
@@ -850,7 +850,7 @@ class tower_control_class
 						if (param=="frz_slow_down" || param=="frz_time" || param=="frz_damage")
 						{
 							
-							objects.towers_upg_text_array[ind].text="Сначала вероятность\nзаморозки купи";
+							objects.towers_upg_text_array[ind].text="Buy freeze\nfirst";
 							not_yet=1;
 						}		
 					}
@@ -922,7 +922,7 @@ class tower_control_class
 		var c_price=init_tower_parameters.price[0];
 		if (screen_3.money<c_price)
 		{			
-			screen_3.send_message("Нужно "+c_price+"$ чтобы построить башню",red);
+			screen_3.send_message(c_price+"$ needed to build tower",red);
 			return;
 		}
 		
@@ -965,7 +965,7 @@ class tower_control_class
 		this.sec_check=game_tick;		
 		
 		//отправляем сообщение что была построена новая башня
-		screen_3.send_message("Построена новая башня",blue);
+		screen_3.send_message("New tower built",blue);
 		
 		//скрываем все чтобы открыто около башни
 		//this.hide_attributes();
@@ -1011,7 +1011,7 @@ class tower_control_class
 		
 		this[param]=new_val;
 		var long_param_name=init_tower_parameters[param][1];
-		screen_3.send_message(long_param_name+" улучшен(а): "+cur_val+" >>> "+new_val,blue);
+		screen_3.send_message(long_param_name+" upgraded: "+cur_val+" >>> "+new_val,blue);
 		
 		//увеличиваем уровень апгрейда
 		this.upgrade_levels[param]++;
@@ -1273,7 +1273,7 @@ class screen_1_class
 				//проигрываем звук
 				game_res.resources.mp3_error.sound.play();
 			
-				screen_3.send_message("Нужно завершить предыдущие уровни",red);				
+				screen_3.send_message("Complete previous levels",red);				
 			}
 
 		}
@@ -1356,7 +1356,7 @@ class screen_2_class
 	{
 		
 		//отображаем количество кристалов
-		objects.crystal_info.text="Кристаллы: "+this.crystals;
+		objects.crystal_info.text="Crystals: "+this.crystals;
 		
 		
 		var ind=0;
@@ -1446,7 +1446,7 @@ class screen_2_class
 			this.upgrade_levels[param]++;		
 			this.crystals-=upg_price;
 			this.crystals_spent+=upg_price;	
-			this.send_message(init_tower_parameters[param][1]+" улучшен(а):\n"+cur_val+" >>> "+ new_val, blue);	
+			this.send_message(init_tower_parameters[param][1]+" upgraded:\n"+cur_val+" >>> "+ new_val, blue);	
 			this.redraw_upg_text();	
 			
 			
@@ -1487,7 +1487,7 @@ class screen_2_class
 		this.crystals_spent=0;
 		this.redraw_upg_text();
 		
-		this.send_message("Все параметры сброшены к начальным",blue);	
+		this.send_message("all upgrades reset",blue);	
 	}
 }
 

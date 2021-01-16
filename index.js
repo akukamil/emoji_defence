@@ -1260,7 +1260,7 @@ class screen_1_class
 		}
 		else
 		{
-			if (this.results[this.selected_map-1]>0)
+			//if (this.results[this.selected_map-1]>0)
 			{
 				
 				//проигрываем звук
@@ -1268,12 +1268,12 @@ class screen_1_class
 			
 				screen_3.load(this.selected_map);					
 			}
-			else
+			//else
 			{
 				//проигрываем звук
-				game_res.resources.mp3_error.sound.play();
+				//game_res.resources.mp3_error.sound.play();
 			
-				screen_3.send_message("Complete previous levels",red);				
+				//screen_3.send_message("Complete previous levels",red);				
 			}
 
 		}
@@ -1660,7 +1660,7 @@ class screen_3_class
 		emojies.forEach(e=>e.set_state(e_inactive));
 		
 		//устанавливаем и отображаем баланс
-		this.money=30;
+		this.money=3330;
 		this.prv_money=this.money;
 		this.change_balance(0);
 		

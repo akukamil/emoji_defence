@@ -35,6 +35,9 @@ e_t_end=3;
 e_hidden=4;
 e_inactive=5;
 
+//выбранная башня
+var selected_tower = -1;
+
 class bullet_class
 {
 	constructor(id)
@@ -638,7 +641,7 @@ class emoji_class
 class tower_control_class
 {	
 
-	static selected_tower = -1;
+	
 
 	constructor(id)
 	{
@@ -719,7 +722,7 @@ class tower_control_class
 		objects.towers_array[this.id].pointerdown=this.show_upgrades.bind(this,true);
 		
 		//в начале игры никакая башня не выбрана
-		tower_control_class.selected_tower=-1;
+		selected_tower=-1;
 		
 		//это стрелка вверх обозначающая наличие апгрейда
 		objects.up_icons[this.id].x=x;
@@ -740,12 +743,12 @@ class tower_control_class
 		towers.forEach(e=>e.hide_attributes())
 		
 		//если это нажатие на открытую уже башню то просто закрываем
-		if (tower_control_class.selected_tower==this.id && as_pressed==true)
+		if (selected_tower==this.id && as_pressed==true)
 		{
 			
 			game_res.resources.mp3_tower_down.sound.play();
 			
-			tower_control_class.selected_tower=-1;
+			selected_tower=-1;
 			return;			
 		}
 		
@@ -763,7 +766,7 @@ class tower_control_class
 		{
 			
 			//играем звук только если это новое открытие
-			if (tower_control_class.selected_tower!=this.id)
+			if (selected_tower!=this.id)
 				game_res.resources.mp3_tower_down.sound.play();
 			
 			//устанавливаем на место башни круг радиуса дейтсвия
@@ -883,7 +886,7 @@ class tower_control_class
 			objects.sell_button.pointerdown=this.sell_down.bind(this);	
 			
 			//запоминаем выбранную башеню
-			tower_control_class.selected_tower=this.id;
+			selected_tower=this.id;
 			
 
 		}
@@ -897,7 +900,7 @@ class tower_control_class
 		
 		//скрываем все чтобы открыто около башни
 		this.hide_attributes();
-		tower_control_class.selected_tower=-1;
+		selected_tower=-1;
 	
 		this.type=slot;	
 		objects.towers_array[this.id].texture=game_res.resources["slot"].texture;
@@ -969,7 +972,7 @@ class tower_control_class
 		
 		//скрываем все чтобы открыто около башни
 		//this.hide_attributes();
-		tower_control_class.selected_tower=-1;
+		selected_tower=-1;
 	
 		
 	}
@@ -1065,7 +1068,7 @@ class tower_control_class
 		}	
 		
 		//обновляем меню апгрейдов если оно открыто
-		if (tower_control_class.selected_tower==this.id)
+		if (selected_tower==this.id)
 			this.show_upgrades(false);
 		
 	}
@@ -1249,8 +1252,6 @@ class screen_1_class
 	button_2_down()
 	{
 		
-		
-		
 		if (this.selected_map==0)
 		{
 			//проигрываем звук
@@ -1260,7 +1261,7 @@ class screen_1_class
 		}
 		else
 		{
-			//if (this.results[this.selected_map-1]>0)
+			if (this.results[this.selected_map-1]>0)
 			{
 				
 				//проигрываем звук
@@ -1268,12 +1269,12 @@ class screen_1_class
 			
 				screen_3.load(this.selected_map);					
 			}
-			//else
+			else
 			{
 				//проигрываем звук
-				//game_res.resources.mp3_error.sound.play();
+				game_res.resources.mp3_error.sound.play();
 			
-				//screen_3.send_message("Complete previous levels",red);				
+				screen_3.send_message("Complete previous levels",red);				
 			}
 
 		}
@@ -1660,7 +1661,7 @@ class screen_3_class
 		emojies.forEach(e=>e.set_state(e_inactive));
 		
 		//устанавливаем и отображаем баланс
-		this.money=3330;
+		this.money=30;
 		this.prv_money=this.money;
 		this.change_balance(0);
 		
@@ -1886,7 +1887,7 @@ class screen_3_class
 	{
 		//скрываем все башни и их аттрибуты
 		towers.forEach(e=>e.hide_attributes());
-		tower_control_class.selected_tower=-1;
+		selected_tower=-1;
 	}
 
 	change_balance(amount)
@@ -1968,31 +1969,18 @@ function resize()
     app.stage.scale.set(nvw / M_WIDTH, nvh / M_HEIGHT);
 }
 
-function preload_ok()
-{
-
-	var rParams = FAPI.Util.getRequestParameters();
-
-	FAPI.init(rParams["api_server"], rParams["apiconnection"],
-
-			  function()
-			  {
-				  ok_loaded=1;
-				  load();
-			  },
-
-			  function(error)
-			  {
-				  ok_loaded=0;
-				  load();
-			  }
-	);	
-	
-}
-
 function load()
 {
-					
+	
+	
+	//проверяем WEB GL
+	if(PIXI.utils.isWebGLSupported()==false)
+	{
+		console.log('WEBGL Not Supported');
+		alert('WEBGL Not Supported');
+		return;
+	}
+	
 	//загружаем ресурсы в соответствии с листом загрузки
 	game_res=new PIXI.Loader();	
 	for (var l=0;l<load_list.length;l++)

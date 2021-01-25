@@ -20,13 +20,32 @@
 		font-family: "m_font";
 		src: url("19508.otf");
 	}
+	
+	#myProgress {
+		margin: 10px;
+		display: flex;
+		align-items: center;
+	  width: 100%;
+	  background-color: #ddd;
+	}
+
+	#myBar {
+		display: flex;
+		align-items: center;
+	  width: 1%;
+	  height: 30px;
+	  background-color: #4CAF50;
+	}
+	
 </style>
 
 <p style="font-size:100px"; id="demo"></p>
 
+<div id="myProgress">
+  <div id="myBar"></div>
+</div>
 
 <body onload="load()">
-	<script src="anim_list.txt"> </script>	
 	<script src="load_list.txt"> </script>	
 	<script src="other_map_res.txt"> </script>	
 	<script src="pixi.min.js"></script>	

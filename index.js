@@ -10,6 +10,7 @@ var tower_upgrades={"range":[[100,0,0],[110,5,3],[120,8,3],[130,11,3],[140,14,4]
 
 var init_tower_parameters={"price":[10,"price"],"range":[100,"range"],"rate":[1,"rate of fire"],"damage":[25,"damage"],"count":[1,"double fire"],"tlp_chance":[0,"change of teleport"],"tlp_damage":[0,"damage when teleport"],"tlp_dist":[50,"teleport distance"],"frz_chance":[0,"freeze chance"],"frz_slow_down":[0.2,"freeze slow down"],"frz_time":[2,"freeze time"],"frz_damage":[0.2,"freeze damage"]};
 
+var anim_list=[21,21,21];
 
 
 var ind_to_param={0:"range",1:"rate",2:"damage",3:"count",4:"tlp_chance",5:"tlp_damage",6:"tlp_dist",7:"frz_chance",8:"frz_slow_down",9:"frz_time",10:"frz_damage"};
@@ -333,6 +334,7 @@ class emoji_class
 			screen_3.completed_emoji += 1;
 			screen_3.change_balance(this.bonus);
 			screen_3.place_explosion(this.emoji.x,this.emoji.y);
+			screen_3.send_bonus_text("+"+this.bonus+"$",this.emoji.x, this.emoji.y);
 			this.set_state(e_inactive);		
 			
 			//проигрываем звук
@@ -352,7 +354,6 @@ class emoji_class
 			this.make_me_red();
 	}
 	
-
 	damage_teleport(amount)
 	{		
 		this.damage(amount*this.susceptibility_teleport);
@@ -641,7 +642,6 @@ class emoji_class
 class tower_control_class
 {	
 
-	
 
 	constructor(id)
 	{
@@ -959,7 +959,7 @@ class tower_control_class
 				
 
 		objects.towers_array[this.id].alpha=1;
-		this.process=this.process_b_twr.bind(this);
+		this.process=this.process_twr.bind(this);
 		
 		//устанавливаем начальное время
 		this.prv_time=game_tick;
@@ -1073,10 +1073,8 @@ class tower_control_class
 		
 	}
 
-	process_b_twr()
+	process_twr()
 	{
-		
-
 		
 		
 		
@@ -1094,6 +1092,7 @@ class tower_control_class
 			var num_of_targets=Math.min(this.count, this.emoji_in_range_count);
 			if (num_of_targets>0)
 			{			
+
 
 				//проигрываем звук
 				var i=game_res.resources.mp3_bullet.sound.instances.length;
@@ -1726,8 +1725,21 @@ class screen_3_class
 		//обрабатываем башни
 		towers.forEach(e=>e.process());
 		
+	
 		//обрабатываем взрывы
 		explosions.forEach(e=>e.process());
+		
+		//обрабатываем бонусные тексты
+		for (var i=0;i<objects.bonus_text_array.length;i++)
+		{
+			if (objects.bonus_text_array[i].visible==true)
+			{
+				objects.bonus_text_array[i].alpha-=0.01;
+				if (objects.bonus_text_array[i].alpha<=0)
+					objects.bonus_text_array[i].visible=false;
+			}
+		}
+		
 		
 		//обрабатываем сообщение
 		if (objects.message_line.visible==true)
@@ -1864,6 +1876,26 @@ class screen_3_class
 		
 		g_process=this.process.bind(this);
 	}
+		
+	send_bonus_text(val,x,y)
+	{
+		//ищем свобоный спрайт для текста
+		for (var i=0;i<objects.bonus_text_array.length;i++)
+		{
+			
+			if (objects.bonus_text_array[i].visible==false)
+			{
+				objects.bonus_text_array[i].visible=true;
+				objects.bonus_text_array[i].alpha=1;
+				objects.bonus_text_array[i].x=x;
+				objects.bonus_text_array[i].y=y;
+				objects.bonus_text_array[i].text=val;
+				return;				
+			}
+		}
+		
+		
+	}
 	
 	back_button2_down()
 	{
@@ -1973,12 +2005,22 @@ function load()
 {
 	
 	
-	//проверяем WEB GL
-	if(PIXI.utils.isWebGLSupported()==false)
+	//проверяем WEB GL	
+	const gl = document.createElement('canvas').getContext('webgl2');
+	if (!gl)
 	{
-		console.log('WEBGL Not Supported');
-		alert('WEBGL Not Supported');
+	  if (typeof WebGL2RenderingContext !== 'undefined')
+	  {
+		alert('WebGL2 disabled or unavailable. Game can not start.');
+		finish();
 		return;
+	  }
+	  else
+	  {
+		alert('WebGL2 not supported. Game can not start.'); 
+		finish();
+		return;
+	  }
 	}
 	
 	//загружаем ресурсы в соответствии с листом загрузки
@@ -2015,7 +2057,9 @@ function load()
 	
 	function load_complete()
 	{
-		document.getElementById("demo").innerHTML = ""
+		var elem = document.getElementById('myProgress');
+		elem.parentNode.removeChild(elem);
+		
 		app = new PIXI.Application({width:M_WIDTH, height:M_HEIGHT,antialias:true,backgroundColor : 0x060600});
 		window.addEventListener("resize", resize());
 
@@ -2111,7 +2155,7 @@ function load()
 
 	function progress(loader, resource)
 	{
-		document.getElementById("demo").innerHTML = Math.round(loader.progress)+"%";
+		document.getElementById("myBar").style.width =  Math.round(loader.progress)+"%";
 	}
 	
 }
